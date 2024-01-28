@@ -1,0 +1,5 @@
+.env
+build/
+postgres-data/
+storage/
+node_modules/

@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"target": "es6",
+		"module": "commonjs",
+		"lib": ["es6"],
+		"allowJs": true,
+		"outDir": "./build",
+		"rootDir": "src",
+		"strict": true,
+		"types": ["reflect-metadata","ioredis"],
+		"moduleResolution": "node",
+		"noImplicitAny": true,
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"experimentalDecorators": true
+	}
+}
