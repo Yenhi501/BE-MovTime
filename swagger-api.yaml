@@ -1,0 +1,3358 @@
+openapi: 3.0.0
+info:
+  description: |
+    API Document for Movie Website
+  version: '1.0.0'
+  title: PBL6-Movie Website API
+  contact:
+    email: example@email.com
+servers:
+  - url: 'http://localhost:8000/api'
+tags:
+  - name: authentication
+    description: API for Authentication
+  - name: movie
+    description: API for Movies
+    externalDocs:
+      description: Find out more
+      url: 'http://swagger.io'
+  - name: episode
+    description: API for Episode
+  - name: genre
+    description: API for Genre
+  - name: comment
+    description: API for Comment
+  - name: rating
+    description: API for Rating
+  - name: home
+    description: API for Home Page
+  - name: user
+    description: Operations about user
+  - name: subscription
+    description: API for subscription
+  - name: payment
+    description: API for payment
+  - name: individuals
+    description: API for actors and directors
+  - name: statistical
+    description: API for statistical
+    externalDocs:
+      description: Find out more about our store
+      url: 'http://swagger.io'
+paths:
+  /auth/login:
+    post:
+      summary: User login
+      tags:
+        - authentication
+      requestBody:
+        description: User credentials for login
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentials'
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /auth/google:
+    get:
+      tags:
+        - authentication
+      summary: Google Login
+      description: Initiate Google authentication
+      parameters: []
+      responses:
+        '302':
+          description: Redirect to Google authentication page
+
+  /auth/google/callback:
+    get:
+      tags:
+        - authentication
+      summary: Google Callback
+      description: Handle Google authentication callback
+
+      responses:
+        '200':
+          description: Successful authentication callback
+        '401':
+          description: Unauthorized
+
+
+  /auth/login-admin:
+    post:
+      summary: Admin login
+      tags:
+        - authentication
+      requestBody:
+        description: Admin credentials for login
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentials'
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: Bad request
+        '403':
+          description: No Permission
+        '500':
+          description: Internal server error
+
+  /auth/register:
+    post:
+      summary: User registration
+      tags:
+        - authentication
+      requestBody:
+        description: User data for registration
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        '200':
+          description: Successful response
+        '500':
+          description: Internal server error
+
+  /auth/register-admin:
+    post:
+      summary: Admin registration
+      tags:
+        - authentication
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Admin data for registration
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        '200':
+          description: Successful response
+        '500':
+          description: Internal server error
+
+  /auth/valid-register:
+    get:
+      summary: Valid username or password when register
+      tags:
+        - authentication
+      parameters:
+        - name: username
+          in: query
+          description: Username
+          required: false
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: Email of the user
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+        '409':
+          description: Valid error
+
+  /auth/change-password:
+    post:
+      summary: Change password
+      tags:
+        - authentication
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Change password
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserChangePassword'
+      responses:
+        '200':
+          description: Successful response
+        '500':
+          description: Internal server error
+          
+  /auth/forgot-password:
+    post:
+      summary: Forgot password
+      tags:
+        - authentication
+      requestBody:
+        description: Change password
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: User's email address.
+                  example: user@example.com
+                token:
+                  type: string
+                  description: Reset token (optional, use for password reset).
+                  example: reset_token
+                password:
+                  type: string
+                  description: New password (required if token is provided).
+                  example: new_password
+      responses:
+        '200':
+          description: Successful response
+        '500':
+          description: Internal server error
+
+  /auth/active-user:
+    post:
+      summary: Active user
+      tags:
+        - authentication
+      requestBody:
+        description: Active user
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                identifier:
+                  type: string
+                  description: User's email address or username.
+                  example: user@example.com
+                token:
+                  type: string
+                  description: token (optional, use for active).
+                  example: active_token
+      responses:
+        '200':
+          description: Successful response
+        '500':
+          description: Internal server error
+
+  /auth/get-access-token:
+    post:
+      summary: Get new Access Token By Refresh Token
+      tags:
+        - authentication
+      requestBody:
+        description: Refresh Token
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+                  default: string
+      responses:
+        '200':
+          description: Successful response
+        '500':
+          description: Internal server error
+
+  /movies:
+    get:
+      tags:
+        - movie
+      summary: Get all movies or by filter
+      description: Get and search movies API
+      parameters:
+        - name: search
+          in: query
+          description: Enter value to search by title and discription of movies
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: isSeries
+          in: query
+          description: Filter by film series or one episode
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: boolean
+              enum:
+                - true
+                - false
+        - name: genre
+          in: query
+          description: Filter by genre movies, enter genre_id of movies(Current id from 1 to 20)
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: nation
+          in: query
+          description: Filter by nation movies, enter movies of movies to filter
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: year
+          in: query
+          description: Filter by year of release movies
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: level
+          in: query
+          description: Choose level to filter
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: number
+              enum:
+                - 0
+                - 1
+        - name: sort
+          in: query
+          description: Choose addition to sort
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - highFavorited
+                - newest
+                - highRated
+        - name: sortBy
+          in: query
+          description: Default sort ASC, if you want change to DESC, select below
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ASC
+                - DESC
+              default: ASC
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 10
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+        '400':
+          description: Khong the lay danh sach phim
+    post:
+      tags:
+        - movie
+      summary: Add a new movie
+      responses:
+        '405':
+          description: Invalid input
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  default: New Movie
+                description:
+                  type: string
+                  default: Write description for new movie here
+                releaseDate:
+                  type: string
+                  format: date-time
+                nation:
+                  type: string
+                  default: Vietnam
+                level:
+                  type: number
+                  format: int8
+                  default: 1
+                isSeries:
+                  type: boolean
+                  default: false
+                actorIds:
+                  type: array
+                  items:
+                    type: number
+                  default: []
+                directorIds:
+                  type: array
+                  items:
+                    type: number
+                  default: []
+                genreIds:
+                  type: array
+                  items:
+                    type: number
+                  default: []
+
+  '/movies/{id}':
+    get:
+      tags:
+        - movie
+      summary: Find Movie by ID
+      description: Returns a single movie
+      operationId: getMovieById
+      parameters:
+        - name: id
+          in: path
+          description: ID of movie to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Movie not found
+      security:
+        - bearerAuth: []
+    put:
+      tags:
+        - movie
+      summary: Updates a movie with form data
+      operationId: updateMovieWithForm
+      parameters:
+        - name: id
+          in: path
+          description: ID of movie that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '405':
+          description: Invalid input
+      security:
+        - petstore_auth:
+            - 'write:pets'
+            - 'read:pets'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  default: New Movie
+                description:
+                  type: string
+                  default: Write description for new movie here
+                releaseDate:
+                  type: string
+                  format: date-time
+                nation:
+                  type: string
+                  default: Vietnam
+                level:
+                  type: number
+                  format: int8
+                  default: 1
+                isSeries:
+                  type: boolean
+                  default: false
+                averageRating:
+                  type: number
+                  format: float
+                  default: 0.0
+                episode:
+                  type: number
+                  format: int8
+                  default: 0
+                numFavorite:
+                  type: number
+                  format: int8
+                  default: 100
+    delete:
+      tags:
+        - movie
+      summary: Deletes a movie by ID
+      operationId: deleteMovie
+      parameters:
+        - name: id
+          in: path
+          description: Movie ID to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Movie deleted successfully
+          content:
+            application/json:
+              example:
+                status: true
+                message: Delete successfully
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Movie not found
+      security:
+        - bearerAuth: []
+  '/movies/get/nations':
+    get:
+      tags:
+        - movie
+      summary: Get all nations
+      description: Returns distinct nations of movies
+      operationId: getAllNations
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Movie not found
+      security:
+        - bearerAuth: []
+  '/movies/get/qrcode':
+    get:
+      tags:
+        - movie
+      summary: Get QR code Of Movie
+      description: Returns QR code of movies
+      parameters:
+        - name: url
+          in: query
+          description: Enter url of movie to create QR Code
+          required: false
+          explode: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Movie not found
+      security:
+        - bearerAuth: []
+  '/movies/get/years':
+    get:
+      tags:
+        - movie
+      summary: Get all release years
+      description: Returns distinct release years of movies
+      operationId: getAllReleaseYears
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Movie not found
+      security:
+        - bearerAuth: []
+
+  '/movies/{movieId}/movie-actor':
+    delete:
+      tags:
+        - movie
+      summary: Delete actors of movie
+      description: Delete actors of movie by actorIds and movieId
+      parameters:
+        - name: movieId
+          in: path
+          description: ID of movie to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                movieId:
+                  type: integer
+                  format: int64
+                  default: 1
+                actorIds:
+                  type: array
+                  default: [1, 2, 3]
+      responses:
+        '200':
+          description: successful
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Movie not found
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - movie
+      summary: Add actors for movie
+      responses:
+        '200':
+          description: Successful
+      parameters:
+        - name: movieId
+          in: path
+          description: ID of movie to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                actorIds:
+                  type: array
+                  default: [1, 2, 3]
+      security:
+        - bearerAuth: []
+
+  '/movies/{movieId}/movie-director':
+    delete:
+      tags:
+        - movie
+      summary: Delete directors of movie
+      description: Delete directors of movie by directorIds and movieId
+      parameters:
+        - name: movieId
+          in: path
+          description: ID of movie to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                directorIds:
+                  type: array
+                  default: [1, 2, 3]
+      responses:
+        '200':
+          description: successful
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Movie not found
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - movie
+      summary: Add directors for movie
+      responses:
+        '200':
+          description: Successful
+      parameters:
+        - name: movieId
+          in: path
+          description: ID of movie to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                directorIds:
+                  type: array
+                  default: [1, 2, 3]
+      security:
+        - bearerAuth: []
+  '/movies/{movieId}/movie-genre':
+    delete:
+      tags:
+        - movie
+      summary: Delete genres of movie
+      description: Delete genres of movie by genreIds and movieId
+      parameters:
+        - name: movieId
+          in: path
+          description: ID of movie to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                genreIds:
+                  type: array
+                  default: [1, 2, 3]
+      responses:
+        '200':
+          description: successful
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Movie not found
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - movie
+      summary: Add genres for movie
+      responses:
+        '200':
+          description: Successful
+      parameters:
+        - name: movieId
+          in: path
+          description: ID of movie to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                genreIds:
+                  type: array
+                  default: [1, 2, 3]
+      security:
+        - bearerAuth: []
+  /movies/get/presign-url:
+    get:
+      tags:
+        - movie
+      summary: Returns presign url to upload movie to s3
+      description: Returns presign url to upload movie to s3
+      parameters:
+        - name: movieId
+          in: query
+          description: ID of movie
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+        - name: option
+          in: query
+          required: true
+          description: Option to get
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - onlyBackground
+                - onlyPoster
+                - onlyTrailer
+                - posterAndBackground
+                - all
+      responses:
+        '200':
+          description: successful operation
+      security:
+        - bearerAuth: []
+  /movies/cloudfront/clear-cache:
+    post:
+      tags:
+        - movie
+      summary:  Clear cache cloud front
+      description: Clear cache cloud front for movies
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                movieId:
+                  type: integer
+                  format: int64
+                  default: 1
+                option:
+                  type: string
+                  enum:
+                    - poster
+                    - background
+                    - trailer
+                    - all
+                  default: 'poster'
+      responses:
+        '200':
+          description: successful operation
+      security:
+        - bearerAuth: []
+
+  /episode/{id}:
+    get:
+      tags:
+        - movie
+      summary: Returns details episode of movie
+      description: Returns details episode of movie
+      parameters:
+        - name: id
+          in: path
+          description: ID of episode to return
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+
+  /episode/{id}/comments:
+    get:
+      tags:
+        - episode
+      summary: Returns comments of episode
+      description: Returns comments of episode
+      parameters:
+        - name: id
+          in: path
+          description: ID of episode to return
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 10
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+  /episode/qualities/{episodeId}:
+    get:
+      tags:
+        - episode
+      summary: Returns quality (4k or 1080p) movie of episode
+      description: Returns quality movie of episode 4k or 1080p
+      parameters:
+        - name: episodeId
+          in: path
+          description: episodeId of episode to return
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+        - name: quality
+          in: query
+          description: Quality of video, 1080p or 4k
+          required: true
+          explode: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+
+  /episode/delete/{episodeId}:
+    delete:
+      tags:
+        - episode
+      summary: Delete episode
+      description: Delete episode by id
+      parameters:
+        - name: episodeId
+          in: path
+          description: commentId to delete
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+
+  /episode/create:
+    post:
+      tags:
+        - episode
+      summary: Add episode for movie
+      description: Add episode for movie
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                movieId:
+                  type: integer
+                  format: int64
+                  default: 1
+                title:
+                  type: string
+                  default: 'Tap 1'
+                releaseDate:
+                  type: string
+                  format: date
+                description:
+                  type: string
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+
+  /episode/update/{episodeId}:
+    put:
+      tags:
+        - episode
+      summary: Update episode
+      description: Update episode
+      parameters:
+        - name: episodeId
+          in: path
+          description: episodeId to update
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                movieId:
+                  type: integer
+                  format: int64
+                  default: 1
+                title:
+                  type: string
+                  default: 'Tap 1'
+                releaseDate:
+                  type: string
+                  format: date
+                duration:
+                  type: integer
+                episodeNo:
+                  type: integer
+                description:
+                  type: string
+                  default: null
+                numView:
+                  type: integer
+                posterURL:
+                  type: string
+                movieURL:
+                  type: string
+
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+  /episode/presignURL/upload:
+    get:
+      tags:
+        - episode
+      summary: Returns presign url to upload movie to s3
+      description: Returns presign url to upload movie to s3
+      parameters:
+        - name: movieId
+          in: query
+          description: ID of movie
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+        - name: episodeNo
+          in: query
+          required: true
+          description: Number of episode of movie
+          explode: true
+          schema:
+            type: number
+        - name: option
+          in: query
+          required: true
+          description: Option to get
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - onlyMovie
+                - onlyPoster
+                - movieAndPoster
+      responses:
+        '200':
+          description: successful operation
+      security:
+        - bearerAuth: []
+  /episode/presignURL/upload/quality:
+    get:
+      tags:
+        - episode
+      summary: Returns presign url to upload quality movie to s3
+      parameters:
+        - name: movieId
+          in: query
+          description: ID of movie
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+        - name: episodeNo
+          in: query
+          required: true
+          description: Number of episode of movie
+          explode: true
+          schema:
+            type: number
+        - name: quality
+          in: query
+          required: true
+          description: Option to get
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - 1080p
+                - 4k
+      responses:
+        '200':
+          description: successful operation
+      security:
+        - bearerAuth: []
+  /episode/cloudfront/clear-cache:
+    post:
+      tags:
+        - episode
+      summary: Update episode
+      description: Update episode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                movieId:
+                  type: integer
+                  format: int64
+                  default: 1
+                episodeNum:
+                  type: integer
+                  format: int64
+                  default: 1
+                quality:
+                  type: string
+                  default: '720p or 1080p or 4k'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+  /genres:
+    get:
+      tags:
+        - genre
+      summary: Returns all genres
+      description: Returns genres
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - genre
+      summary: Create new genre
+      description: Create new genre
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+
+      security:
+        - bearerAuth: []
+  /genres/{genreId}:
+    put:
+      tags:
+        - genre
+      summary: Update genre information
+      description: Update genre information
+      parameters:
+        - name: genreId
+          in: path
+          description: genreId to update
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: 'Name of genre to update'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - genre
+      summary: Delete a genre
+      description: Delete a genre by genreId
+      parameters:
+        - name: genreId
+          in: path
+          description: genreId to delete
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+  /comments/create:
+    post:
+      tags:
+        - comment
+      summary: Add comment for episode
+      description: Add comment for episode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                episodeId:
+                  type: integer
+                  format: int64
+                  default: 1
+                content:
+                  type: string
+                  default: 'Add comment here'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+  /comments/delete/{commentId}:
+    delete:
+      tags:
+        - comment
+      summary: Delete comment
+      description: Delete comment by id
+      parameters:
+        - name: commentId
+          in: path
+          description: commentId to delete
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+  /comments/edit/{commentId}:
+    put:
+      tags:
+        - comment
+      summary: Edit comment
+      description: Edit comment
+      parameters:
+        - name: commentId
+          in: path
+          description: commentId to update
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  default: 'content to update'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+
+  /comments/sub-comments/create:
+    post:
+      tags:
+        - comment
+      summary: Add sub comment for episode
+      description: Add sub comment for episode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parentId:
+                  type: integer
+                  format: int64
+                  default: 1
+                content:
+                  type: string
+                  default: 'Add comment here'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+  /comments/sub-comments/delete/{subCommentId}:
+    delete:
+      tags:
+        - comment
+      summary: Delete sub comment
+      description: Delete sub comment by id
+      parameters:
+        - name: subCommentId
+          in: path
+          description: subCommentId to delete
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+  /comments/sub-comments/edit/{subCommentId}:
+    put:
+      tags:
+        - comment
+      summary: Edit sub comment
+      description: Edit sub comment
+      parameters:
+        - name: subCommentId
+          in: path
+          description: subCommentId to update
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  default: 'content to update'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+  /ratings:
+    put:
+      tags:
+        - rating
+      summary: Update rating information
+      description: Update rating information
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  format: int64
+                movieId:
+                  type: integer
+                  format: int64
+                rating:
+                  type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - rating
+      summary: Delete a rating
+      description: Delete a rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  format: int64
+                movieId:
+                  type: integer
+                  format: int64
+      responses:
+        '204':
+          description: successful
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+  /ratings/create:
+    post:
+      tags:
+        - rating
+      summary: Add rating for movie
+      description: Add rating for movie
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                movieId:
+                  type: integer
+                  format: int64
+                rating:
+                  type: number
+                  format: float
+                  default: 5.0
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
+      security:
+        - bearerAuth: []
+  /home/genres:
+    get:
+      tags:
+        - home
+      summary: Get movies by genre
+      description: Get list genres and movies of genre
+      operationId: findMoviesByGenre
+      parameters:
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 6
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Error while get movies by genres
+  /home/posters:
+    get:
+      tags:
+        - home
+      summary: Get movie for home page
+      description: Get movie for home page
+      parameters:
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 6
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Error while get movies by genres
+  /home/headers:
+    get:
+      tags:
+        - home
+      summary: Get nations and genres disctinct for header
+      description: Get list genres and movies of genre
+      responses:
+        '200':
+          description: successful operation
+        '500':
+          description: Server Error
+  /home/genres/{genreId}:
+    get:
+      tags:
+        - home
+      summary: Get movies by genre
+      description: Get list genres and movies of genre
+      operationId: findMoviesByGenre
+      parameters:
+        - name: genreId
+          in: path
+          description: Enter value to search by title and discription of movies
+          required: true
+          explode: true
+          schema:
+            type: number
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 6
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+        '400':
+          description: Error while get movies by genres
+  /movies/home/trending:
+    get:
+      tags:
+        - home
+      summary: Get movies trending
+      description: Get moives trending for home
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+        '400':
+          description: Error while get movies trending
+
+  /movies/recommend/get:
+    get:
+      tags:
+        - home
+      summary: Get movies recommender for user
+      description: Get moives recommender for user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+        '400':
+          description: Error while get movies recommender
+  /movies/recommend/related-movies:
+    get:
+      tags:
+        - movie
+      summary: Get related-movies 
+      parameters:
+        - name: movieId
+          in: query
+          description: Enter value of movieId
+          required: true
+          explode: true
+          schema:
+            type: number      
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Error while get movies recommender
+
+  /movies/home/upcoming:
+    get:
+      tags:
+        - home
+      summary: Get movies upcoming
+      description: Get moives upcoming
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+        '400':
+          description: Error while get movies recommender
+
+  /movies/home/vip:
+    get:
+      tags:
+        - home
+      summary: Get movies for user vip
+      description: Get moives for user vip
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+        '400':
+          description: Error while get movies recommender
+
+  /user/get-all-users:
+    get:
+      summary: Get all users and search user
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: true
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: Number of items per page
+          required: true
+          schema:
+            type: integer
+        - name: search
+          in: query
+          description: Search string for find user by username and email
+          schema:
+            type: string
+        - name: subscriptionType
+          in: query
+          description: Find Subscription Type (Value 0 for VIP,1 for guest, 2 3 for VipType)
+          schema:
+            type: string
+        - name: sortType
+          in: query
+          description: ASC or DESC by userId
+          schema:
+            type: string
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+
+  /user/get-user:
+    get:
+      summary: Get user by username, email, or userId
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: query
+          description: Username of the user
+          required: false
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: Email of the user
+          required: false
+          schema:
+            type: string
+        - name: userId
+          in: query
+          description: ID of the user
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+
+  /user/get-self-information:
+    get:
+      summary: Get information about the authenticated user
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+
+  /user/update-self-information:
+    put:
+      summary: Update user information
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Api for user edit self info
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dateOfBirth:
+                  type: string
+                  description: User's date of birth (optional).
+                  example: '1990-01-01'
+                gender:
+                  type: string
+                  description: User's gender (optional).
+                  example: 'male'
+      responses:
+        '200':
+          description: Successful response
+
+  /user/update-user:
+    put:
+      summary: Update user information for admin
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: User data to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Successful response
+
+  /user/create-user:
+    post:
+      summary: Create a new user
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: User data for registration
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        '200':
+          description: Successful response
+
+  /user/delete-user:
+    delete:
+      summary: Delete a user by userId
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: query
+          description: ID of the user to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+
+  /user/add-favorite-movie:
+    get:
+      summary: Add a movie to the favorites
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: movieId
+          in: query
+          description: ID of the movie to add to favorites
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+
+  /user/delete-favorite-movie:
+    delete:
+      summary: Remove a movie from the favorites
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: movieId
+          in: query
+          description: ID of the movie to remove from favorites
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+
+  /user/get-favorite-movie-list:
+    get:
+      summary: Get the list of favorite movies
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+
+  /user/add-watch-list:
+    get:
+      summary: Add a movie to the watch list
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: movieId
+          in: query
+          description: ID of the movie to add to watch list
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+
+  /user/delete-watch-list:
+    delete:
+      summary: Remove a movie from the watch list
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: movieId
+          in: query
+          description: ID of the movie to remove from watch list
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+
+  /user/get-watch-movie-list:
+    get:
+      summary: Get the watch list
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+
+  /user/add-movie-history:
+    get:
+      summary: Add a movie to the watch history
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: episodeId
+          in: query
+          description: ID of the episode to add to watch history
+          required: true
+          schema:
+            type: integer
+        - name: duration
+          in: query
+          description: Duration of the movie in minutes
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+
+  /user/delete-movie-history:
+    delete:
+      summary: Remove a movie from the watch history
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: episodeId
+          in: query
+          description: ID of the episode to remove from watch history
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+
+  /user/get-movie-history-list:
+    get:
+      summary: Get the watch history list
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+
+  /user/get-movie-history:
+    get:
+      summary: Get the watch history for a specific movie
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: movieId
+          in: query
+          description: ID of the movie to get watch history
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+  /user/get-presign-url-to-upload-avatar:
+    get:
+      summary: Get presign to upload avatar
+      description: Get presign to upload avatar user to S3
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+  /user/reserves:
+    get:
+      tags:
+        - user
+      summary: Returns reserve movies of user
+      description: Returns reserve movies of user
+      responses:
+        '200':
+          description: successful operation
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - user
+      summary: Add reserve movies of user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                movieId:
+                  type: integer
+                  format: int64
+                  default: 1
+      responses:
+        '200':
+          description: successful operation
+      security:
+        - bearerAuth: []
+  /user/reserves/{movieId}:
+    delete:
+      tags:
+        - user
+      summary: Delete reserve movies of user
+      parameters:
+        - name: movieId
+          in: path
+          description: commentId to delete
+          required: true
+          explode: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+      security:
+        - bearerAuth: []
+  /user/remove-avatar:
+    delete:
+      tags:
+        - user
+      summary: Delete avatar of user
+      responses:
+        '200':
+          description: successful operation
+      security:
+        - bearerAuth: []
+  /individuals/actors:
+    get:
+      summary: Get actors
+      description: Get actors, include search parameters by name
+      tags:
+        - individuals
+      parameters:
+        - name: name
+          in: query
+          description: name of the actor to search
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: page, default is 1
+          required: false
+          schema:
+            type: string
+        - name: pageSize
+          in: query
+          description: pageSize, default is 10
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+      security:
+        - bearerAuth: []
+  /user/payments:
+    get:
+      tags:
+        - user
+      summary: Returns payments of user
+      description: Returns payments movies of user
+      responses:
+        '200':
+          description: successful operation
+      security:
+        - bearerAuth: []
+  /user/cloudfront/clear-cache:
+    post:
+      tags:
+        - user
+      summary: Clear cache cloudfront for avatar user
+      responses:
+        '200':
+          description: successful operation
+      security:
+        - bearerAuth: []
+  /individuals/actors/get-presign-url/avatar:
+    get:
+      summary: Get presign url to upload avatar actor
+      description: Get presign url to upload avatar actor
+      tags:
+        - individuals
+      parameters:
+        - name: actorId
+          in: query
+          description: id of the actor
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Successful response
+      security:
+        - bearerAuth: []
+    post:
+      summary: Create a new actor
+      description: Create a new actor
+      tags:
+        - individuals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: New Actor
+                gender:
+                  type: string
+                  default: Male
+                dateOfBirth:
+                  type: string
+                  format: date-time
+                  default: '1955-05-18T00:00:00.000Z'
+                description:
+                  type: string
+                  default: New actor description
+      responses:
+        '200':
+          description: Successful response
+      security:
+        - bearerAuth: []
+
+  /individuals/actors/{actorId}:
+    get:
+      summary: Get actor details
+      description: Get actor details
+      tags:
+        - individuals
+      parameters:
+        - name: actorId
+          in: path
+          description: actorId
+          required: true
+          schema:
+            type: number
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+      security:
+        - bearerAuth: []
+    delete:
+      summary: Delete actor
+      description: Delete actor
+      tags:
+        - individuals
+      parameters:
+        - name: actorId
+          in: path
+          description: actorId
+          required: true
+          schema:
+            type: number
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+      security:
+        - bearerAuth: []
+    put:
+      summary: Update actor informations
+      description: Update actor informations
+      tags:
+        - individuals
+      parameters:
+        - name: actorId
+          in: path
+          description: actorId
+          required: true
+          schema:
+            type: number
+            format: int64
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: Name Actor To Update
+                gender:
+                  type: string
+                  default: Male
+                dateOfBirth:
+                  type: string
+                  format: date-time
+                  default: '1955-05-18T00:00:00.000Z'
+                description:
+                  type: string
+                  default: New actor description
+      responses:
+        '200':
+          description: Successful response
+  /individuals/directors:
+    get:
+      summary: Get directors
+      description: Get directors, include search parameters by name
+      tags:
+        - individuals
+      parameters:
+        - name: name
+          in: query
+          description: name of the actor to search
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: page, default is 1
+          required: false
+          schema:
+            type: string
+        - name: pageSize
+          in: query
+          description: pageSize, default is 10
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+      security:
+        - bearerAuth: []
+  /individuals/directors/get-presign-url/avatar:
+    get:
+      summary: Get presign url to upload avatar actor
+      description: Get presign url to upload avatar actor
+      tags:
+        - individuals
+      parameters:
+        - name: directorId
+          in: query
+          description: id of the actor
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Successful response
+      security:
+        - bearerAuth: []
+    post:
+      summary: Create a new director
+      description: Create a new director
+      tags:
+        - individuals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: New Director
+                gender:
+                  type: string
+                  default: Male
+                dateOfBirth:
+                  type: string
+                  format: date-time
+                  default: '1955-05-18T00:00:00.000Z'
+                description:
+                  type: string
+                  default: New actor description
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+
+  /individuals/directors/{directorId}:
+    get:
+      summary: Get director details
+      description: Get director details
+      tags:
+        - individuals
+      parameters:
+        - name: directorId
+          in: path
+          description: directorId
+          required: true
+          schema:
+            type: number
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+      security:
+        - bearerAuth: []
+    delete:
+      summary: Delete a director
+      description: Delete a director by directorId
+      tags:
+        - individuals
+      parameters:
+        - name: directorId
+          in: path
+          description: directorId
+          required: true
+          schema:
+            type: number
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+      security:
+        - bearerAuth: []
+    put:
+      summary: Update director informations
+      description: Update director informations
+      tags:
+        - individuals
+      parameters:
+        - name: directorId
+          in: path
+          description: directorId
+          required: true
+          schema:
+            type: number
+            format: int64
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: Name director To Update
+                gender:
+                  type: string
+                  default: Male
+                dateOfBirth:
+                  type: string
+                  format: date-time
+                  default: '1955-05-18T00:00:00.000Z'
+                description:
+                  type: string
+                  default: New director description
+      responses:
+        '200':
+          description: Successful response
+  /individuals/cloudfront/clear-cache:
+    post:
+      summary: Get directors
+      description: Get directors, include search parameters by name
+      tags:
+        - individuals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int64
+                  default: 1
+                option:
+                  type: string
+                  enum:
+                    - directors
+                    - actors
+                  default: 'actors'
+      responses:
+        '200':
+          description: Successful response
+      security:
+        - bearerAuth: []
+  /subscription/update-subscription:
+    put:
+      tags:
+        - subscription
+      summary: Update Subscription
+      description: cách sử dụng  nếu truyền chỉ một mình subscriptionInfoId thì là cập nhật theo gói (có nó thì chỉ có mình nó truyền vào), closeAt và subscriptionTypeId thì truyền về cái nào sửa cái đấy, userId bắt buộc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subscriptionTypeId:
+                  type: integer
+                userId:
+                  type: integer
+                closeAt:
+                  type: string
+                  format: date-time
+                subscriptionInfoId:
+                  type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                status: Ok!
+                message: Successfully
+
+  /subscription/create-subscription-type:
+    post:
+      tags:
+        - subscription
+      summary: Create Subscription Type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                status: Ok!
+                message: Successfully
+      security:
+        - bearerAuth: []
+
+  /subscription/update-subscription-type:
+    put:
+      tags:
+        - subscription
+      summary: Update Subscription Type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
+                subscriptionTypeId:
+                  type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                status: Ok!
+                message: Successfully
+
+  /subscription/get-all-subscription-type:
+    get:
+      tags:
+        - subscription
+      summary: Get All Subscription Types
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                status: Ok!
+                message: Successfully
+                data: []
+      security:
+        - bearerAuth: []
+
+  /subscription/delete-subscription-type:
+    delete:
+      tags:
+        - subscription
+      summary: Delete Subscription Type
+      parameters:
+        - name: subscriptionTypeId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                status: Ok!
+                message: Successfully
+      security:
+        - bearerAuth: []
+
+  /subscription/create-subscription-info:
+    post:
+      tags:
+        - subscription
+      summary: Create Subscription Type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subscriptionTypeId:
+                  type: number
+                durationId:
+                  type: number
+                discount:
+                  type: number
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                status: Ok!
+                message: Successfully
+
+  /subscription/update-subscription-info:
+    put:
+      tags:
+        - subscription
+      summary: Update Subscription Info
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subscriptionTypeId:
+                  type: number
+                durationId:
+                  type: number
+                discount:
+                  type: number
+                subscriptionInfoId:
+                  type: number
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                status: Ok!
+                message: Successfully
+      security:
+        - bearerAuth: []
+
+  /subscription/get-all-subscription-info:
+    get:
+      tags:
+        - subscription
+      summary: Get All Subscription Info
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                status: Ok!
+                message: Successfully
+                data: []
+      security:
+        - bearerAuth: []
+
+  /subscription/delete-subscription-info:
+    delete:
+      tags:
+        - subscription
+      summary: Delete Subscription Info
+      parameters:
+        - name: subscriptionInfoId
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                status: Ok!
+                message: Successfully
+      security:
+        - bearerAuth: []
+  /payments:
+    get:
+      tags:
+        - payment
+      summary: Get payments by filter
+      description: Get payments by filter
+      parameters:
+        - name: search
+          in: query
+          description: Enter value to search by orderInfo
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: type of payment
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - VN Pay
+                - Paypal
+        - name: isPayment
+          in: query
+          description: status of payment
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: boolean
+              enum:
+                - true
+                - false
+        - name: status
+          in: query
+          description: information status of payment
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: boolean
+              enum:
+                - Unpaid
+                - Completed
+                - Processing
+                - Failed
+        - name: subscriptionInfoId
+          in: query
+          description: Id of subscription to find
+          required: false
+          explode: true
+          schema:
+            type: string
+        - name: userId
+          in: query
+          description: Id of User to find
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Start date
+          example: 2020-01-01
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: End date
+          example: 2024-01-01
+        - name: page
+          in: query
+          description: Use to pagination, default page = 1
+          required: false
+          explode: true
+          schema:
+            type: number
+        - name: pageSize
+          in: query
+          description: Use to pagination, default pageSize = 15
+          required: false
+          explode: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+        '400':
+          description: Khong the lay danh sach phim
+      security:
+        - bearerAuth: []
+  /payments/vn-pay:
+    post:
+      tags:
+        - payment
+      summary: Create VN Pay Payment URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                price:
+                  type: number
+                  format: int64
+                  default: 100000
+                ipAddress:
+                  type: string
+                  default: '127.0.0.1'
+                subscriptionInfoId:
+                  type: number
+                  format: int8
+                  default: 2
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                success: true
+                message: Successfully
+                data:
+                  - url: 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?vnp_Amount=10000000&vnp_Command=pay&vnp_CreateDate=20231209102913&vnp_CurrCode=VND&vnp_IpAddr=127.0.0.1&vnp_Locale=vn&vnp_OrderInfo=User_1+Thanh+to%C3%A1n+g%C3%B3i+Ti%C3%AAu+chu%E1%BA%A9n+1+th%C3%A1ng&vnp_OrderType=other&vnp_ReturnUrl=http%3A%2F%2Flocalhost%3A8000%2Fapi%2Fpayments%2Fvn-pay%2Fverify&vnp_TmnCode=4YOYYZHU&vnp_TxnRef=2023120910291357803&vnp_Version=2.1.0&vnp_SecureHash=4b9ed3e360fbfd091839431bcba949cd11157f64a5ffc5a9b8cd635056f771fcf66979e99bbffdb79fdf829b72a70f8e0cef7e86e645c86025505ef2f93217bc'
+  /payments/vn-pay/verify:
+    get:
+      tags:
+        - payment
+      summary: Verify VN Pay return URL
+      parameters:
+        - name: vnp_TmnCode
+          in: query
+          description: vnp_TmnCode
+          required: true
+          explode: true
+          schema:
+            type: string
+            default: 4YOYYZHU
+        - name: vnp_Amount
+          in: query
+          description: vnp_Amount
+          required: true
+          explode: true
+          schema:
+            type: number
+            default: 10000000
+        - name: vnp_BankCode
+          in: query
+          description: vnp_BankCode
+          required: true
+          explode: true
+          schema:
+            type: string
+            default: NCB
+        - name: vnp_BankTranNo
+          in: query
+          description: vnp_BankTranNo
+          required: true
+          explode: true
+          schema:
+            type: string
+            default: VNP14232454
+        - name: vnp_CardType
+          in: query
+          description: vnp_CardType
+          required: true
+          explode: true
+          schema:
+            type: string
+            default: ATM
+        - name: vnp_PayDate
+          in: query
+          description: vnp_PayDate
+          required: true
+          explode: true
+          schema:
+            type: string
+            default: 20231210110705
+        - name: vnp_OrderInfo
+          in: query
+          description: vnp_OrderInfo
+          required: true
+          explode: true
+          schema:
+            type: string
+            default: User_1 Thanh toán gói Tiêu chuẩn 1 tháng
+        - name: vnp_TransactionNo
+          in: query
+          description: vnp_TransactionNo
+          required: true
+          explode: true
+          schema:
+            type: number
+            default: 14232454
+        - name: vnp_ResponseCode
+          in: query
+          description: vnp_ResponseCode
+          required: true
+          explode: true
+          schema:
+            type: string
+            default: '00'
+        - name: vnp_TransactionStatus
+          in: query
+          description: vnp_TransactionStatus
+          required: true
+          explode: true
+          schema:
+            type: string
+            default: '00'
+        - name: vnp_TxnRef
+          in: query
+          description: vnp_TxnRef
+          required: true
+          explode: true
+          schema:
+            type: string
+            default: '2023121004045115486'
+        - name: vnp_SecureHash
+          in: query
+          description: vnp_SecureHash
+          required: true
+          explode: true
+          schema:
+            type: string
+            default: '22eada02e5262e051300b1c05b12e76bf5f3e4cf7117cab1d06c659d3e805129489ffae0fb52554c7f9630aa90ed963453a52d391299aae88df33c209302e7e6'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example:
+                status: Ok!
+                message: Successfully
+
+  /payments/paypal:
+    post:
+      tags:
+        - payment
+      summary: Create Paypal Order
+      description: Create a new Paypal order
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subscriptionInfoId:
+                  type: string
+      responses:
+        '200':
+          description: Successful operation
+
+  /payments/paypal/cancel:
+    delete:
+      tags:
+        - payment
+      summary: Cancel Paypal Order
+      description: Cancel an existing Paypal order
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: token
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+
+  /payments/paypal/capture:
+    post:
+      tags:
+        - payment
+      summary: Capture Paypal Order
+      description: Capture funds for an existing Paypal order
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order_id:
+                  type: string
+      responses:
+        '200':
+          description: Successful operation
+
+
+
+  '/statisticals/revenues':
+    get:
+      tags:
+        - statistical
+      summary: Get revenue statistical
+      description: Get revenue statistical by day, week, month, year or payment type
+      parameters:
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Start date
+          example: 2020-01-01
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: End date
+          example: 2024-01-01
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: number
+          description: userId
+        - name: statisBy
+          in: query
+          required: false
+          description: statistical by day, week, month, year, paymentType
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - day
+                - week
+                - year
+                - month
+                - paymentType
+      operationId: getRevenueStatistics
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Movie not found
+      security:
+        - bearerAuth: []
+  '/statisticals/movies-by-genres':
+    get:
+      tags:
+        - statistical
+      summary: Statistical number of movies by genres
+      description: Statistical number of movies by genres
+      responses:
+        '200':
+          description: successful
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Movie not found
+      security:
+        - bearerAuth: []
+  '/statisticals/comments':
+    get:
+      tags:
+        - statistical
+      summary: Statistical comment of user
+      description: Get revenue statistical by day, week, month, year or payment type
+      parameters:
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Start date
+          example: 2020-01-01
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: End date
+          example: 2024-01-01
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Movie not found
+      security:
+        - bearerAuth: []
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        userId:
+          type: integer
+        email:
+          type: string
+        dateOfBirth:
+          type: string
+        gender:
+          type: string
+        username:
+          type: string
+
+    UserRegistration:
+      type: object
+      properties:
+        email:
+          type: string
+        dateOfBirth:
+          type: string
+        gender:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+
+    UserCredentials:
+      type: object
+      properties:
+        username:
+          type: string
+          default: username3
+        password:
+          type: string
+          default: password
+
+    UserChangePassword:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+          default: password
+        newPassword:
+          type: string
+          default: password1
+
+    Movie:
+      type: object
+      properties:
+        movieId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: string
+        releaseDate:
+          type: string
+          format: date-time
+        nation:
+          type: string
+          format: string
+        posterURL:
+          type: string
+          format: string
+        trailerURL:
+          type: string
+          format: string
+        backgroundURL:
+          type: string
+          format: string
+        averageRating:
+          type: number
+        episodeNum:
+          type: number
+        level:
+          type: number
+          enum:
+            - 0
+            - 1
+            - 2
+            - 3
+        isSeries:
+          type: boolean
+          default: false
+        numFavorite:
+          type: number
+      xml:
+        name: Order
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+      xml:
+        name: Category
+
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+      xml:
+        name: Tag
+    Pet:
+      type: object
+      required:
+        - name
+        - photoUrls
+      properties:
+        id:
+          type: integer
+          format: int64
+        category:
+          $ref: '#/components/schemas/Category'
+        name:
+          type: string
+          example: doggie
+        photoUrls:
+          type: array
+          xml:
+            name: photoUrl
+            wrapped: true
+          items:
+            type: string
+        tags:
+          type: array
+          xml:
+            name: tag
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/Tag'
+        status:
+          type: string
+          description: pet status in the store
+          enum:
+            - available
+            - pending
+            - sold
+      xml:
+        name: Pet
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+  requestBodies:
+    Pet:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Pet'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Pet'
+      description: Pet object that needs to be added to the store
+      required: true
+    UserArray:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/User'
+      description: List of user object
+      required: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    api_key:
+      type: apiKey
+      in: header
+      name: Authorization
