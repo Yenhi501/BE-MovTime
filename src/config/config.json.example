@@ -1,0 +1,30 @@
+{
+  "development": {
+	"username": "root",
+    "password": "root",
+    "database": "movies_database",
+    "host": "db",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "root",
+    "password": "root",
+    "database": "movies_database_test",
+    "host": "db",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+
+  "production": {
+		"username": "admin123",
+		"password": "123456789Aa",
+		"database": "movies_database",
+		"host": "movies.postgres.database.azure.com",
+		"port": 5432,
+		"dialect": "postgres",
+		"dialectOptions": {
+				"ssl": true
+		}
+	}
+}
