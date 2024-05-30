@@ -1,14 +1,16 @@
-import { Request, Response } from 'express';
 import { User } from '../models/User';
 import { AuthenticationService } from '../services/AuthenticationService';
 import { IAuthenticationService } from '../services/Interfaces/IAuthenticationService';
 import { IUserService } from '../services/Interfaces/IUserService';
 import { UserService } from './../services/UserService';
+import { Request, Response } from 'express';
 
 import Container from 'typedi';
-import { handleErrorController } from '../error/CustomErrors';
-import { IPaymentService } from '../services/Interfaces/IPaymentService';
+import { MovieService } from '../services/MovieService';
+import { IMovieService } from '../services/Interfaces/IMovieService';
 import { PaymentService } from '../services/PaymentService';
+import { IPaymentService } from '../services/Interfaces/IPaymentService';
+import { handleErrorController } from '../error/CustomErrors';
 
 export class UserController {
 	private userService: IUserService;

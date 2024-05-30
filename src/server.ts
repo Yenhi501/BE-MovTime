@@ -7,6 +7,20 @@ import swaggerUi from 'swagger-ui-express';
 import yaml from 'yaml';
 import Database from './config/database';
 import './middleware/Passport';
+import AuthenticationRouter from './route/AuthenticationRoutes';
+import ChatRoutes from './route/ChatRoutes';
+import CommentRouter from './route/CommentRoutes';
+import EpisodeRouter from './route/EpisodeRoutes';
+import GenreRouter from './route/GenreRoutes';
+import HomeRouter from './route/HomeRoutes';
+import IndividualRouter from './route/IndividualRoutes';
+import MovieRouter from './route/MovieRoutes';
+import PaymentRouter from './route/PaymentRoutes';
+import RatingRouter from './route/RatingRoutes';
+import StatisticalRouter from './route/StatisticalRoutes';
+import SubscriptionRouter from './route/SubscriptionRoutes';
+import UserRouter from './route/UserRoutes';
+import { setupSchedule } from './utils/ScheduleTask';
 
 class App {
 	public app: Application;
@@ -16,7 +30,7 @@ class App {
 		this.databaseSync();
 		this.plugins();
 		this.routes();
-		// this.initSchedule();
+		this.initSchedule();
 	}
 
 	private databaseSync(): void {
@@ -35,7 +49,19 @@ class App {
 		this.app.route('/').get((req: Request, res: Response) => {
 			res.send('Test API!!!');
 		});
-		
+		this.app.use('/api/movies', MovieRouter);
+		this.app.use('/api/auth', AuthenticationRouter);
+		this.app.use('/api/user', UserRouter);
+		this.app.use('/api/home', HomeRouter);
+		this.app.use('/api/individuals', IndividualRouter);
+		this.app.use('/api/episode', EpisodeRouter);
+		this.app.use('/api/subscription', SubscriptionRouter);
+		this.app.use('/api/payments', PaymentRouter);
+		this.app.use('/api/genres', GenreRouter);
+		this.app.use('/api/comments', CommentRouter);
+		this.app.use('/api/ratings', RatingRouter);
+		this.app.use('/api/statisticals', StatisticalRouter);
+		this.app.use('/api/chat', ChatRoutes);
 
 		const yamlFile = fs.readFileSync('swagger-api.yaml', 'utf8');
 		const options = yaml.parse(yamlFile);
@@ -51,10 +77,10 @@ class App {
 		this.app.use(cors()); // Use the cors middleware here
 	}
 
-	// private initSchedule(): void {
-	// 	// Khởi tạo cron job
-	// 	setupSchedule()
-	// }
+	private initSchedule(): void {
+		// Khởi tạo cron job
+		setupSchedule()
+	}
 }
 
 const port: number = 8000;

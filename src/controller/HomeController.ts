@@ -1,11 +1,11 @@
-import { Request, Response } from 'express';
+import express, { Request, Response, Router } from 'express';
 import Container from 'typedi';
-import { GenreService } from '../services/GenreService';
-import { HomeService } from '../services/HomeService';
-import { IGenreService } from '../services/Interfaces/IGenreService';
 import { IHomeService } from '../services/Interfaces/IHomeService';
+import { HomeService } from '../services/HomeService';
 import { IMovieService } from '../services/Interfaces/IMovieService';
 import { MovieService } from '../services/MovieService';
+import { IGenreService } from '../services/Interfaces/IGenreService';
+import { GenreService } from '../services/GenreService';
 
 export class HomeController {
 	private homeService: IHomeService;
