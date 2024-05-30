@@ -1,10 +1,10 @@
 import {
-	Model,
-	Table,
+	BelongsToMany,
 	Column,
 	DataType,
-	BelongsToMany,
 	DeletedAt,
+	Model,
+	Table,
 } from 'sequelize-typescript';
 import { Movie } from './Movie';
 import { MovieActor } from './MovieActor';

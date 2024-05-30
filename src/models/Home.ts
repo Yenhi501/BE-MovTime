@@ -1,13 +1,11 @@
 import {
-	Model,
-	Table,
+	BelongsTo,
 	Column,
 	DataType,
-	BelongsToMany,
 	DeletedAt,
-    HasOne,
-    BelongsTo,
-    ForeignKey,
+	ForeignKey,
+	Model,
+	Table
 } from 'sequelize-typescript';
 import { Movie } from './Movie';
 

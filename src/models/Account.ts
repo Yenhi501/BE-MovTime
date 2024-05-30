@@ -1,9 +1,9 @@
 import {
-    Column,
-    DataType,
-    DeletedAt,
-    Model,
-    Table
+	Column,
+	DataType,
+	DeletedAt,
+	Model,
+	Table
 } from 'sequelize-typescript';
 
 

@@ -1,13 +1,13 @@
 import {
-	Table,
 	Column,
-	Model,
-	ForeignKey,
 	DataType,
 	DeletedAt,
+	ForeignKey,
+	Model,
+	Table,
 } from 'sequelize-typescript';
-import { Movie } from './Movie';
 import { Actor } from './Actor';
+import { Movie } from './Movie';
 
 @Table({
 	tableName: MovieActor.MOVIEACTOR_TABLE_NAME,

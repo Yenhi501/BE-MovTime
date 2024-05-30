@@ -1,7 +1,7 @@
-import express, { Request, Response, Router } from 'express';
+import { Request, Response } from 'express';
 import Container from 'typedi';
-import { IGenreService } from '../services/Interfaces/IGenreService';
 import { GenreService } from '../services/GenreService';
+import { IGenreService } from '../services/Interfaces/IGenreService';
 
 export class GenreController{
 	private genreService: IGenreService;
