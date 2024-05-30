@@ -1,12 +1,12 @@
-import { Request, Response } from 'express';
+import { MovieService } from './../services/MovieService';
+import express, { Request, Response, Router } from 'express';
 import Container from 'typedi';
 import { IMovieService } from '../services/Interfaces/IMovieService';
 import { IRecommenderService } from '../services/Interfaces/IRecommenderService';
-import { QRCodeService } from '../services/QRCodeService';
-import { RatingService } from '../services/RatingService';
 import { RecommenderSerivce } from '../services/RecommenderService';
 import { UserService } from '../services/UserService';
-import { MovieService } from './../services/MovieService';
+import { QRCodeService } from '../services/QRCodeService';
+import { RatingService } from '../services/RatingService';
 
 export class MovieController {
 	private movieService: IMovieService;
