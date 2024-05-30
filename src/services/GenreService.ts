@@ -1,17 +1,18 @@
 import { Inject, Service } from 'typedi';
+import { S3Service } from './S3Service';
 import { IGenreService } from './Interfaces/IGenreService';
+import { GenreRepository } from '../repository/GenreRepository';
+import { IGenreRepository } from '../repository/Interfaces/IGenreRepository';
 import { Genre } from '../models/Genre';
 import { Request } from 'express';
-import { IGenreRepository } from '../repository/Interfaces/IGenreRepository';
-import { GenreRepository } from '../repository/GenreRepository';
 
 @Service()
 export class GenreService implements IGenreService {
 	@Inject(() => GenreRepository)
 	private genreRepository!: IGenreRepository;
 
-	// @Inject(() => S3Service)
-	// private s3Service!: S3Service;
+	@Inject(() => S3Service)
+	private s3Service!: S3Service;
 
     async getAllGenres(): Promise<Genre[]> {
         try {
