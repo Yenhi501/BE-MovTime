@@ -25,8 +25,8 @@ export interface IMovieService {
 	getAllReleaseYears(): Promise<number[]>;
 	getPresignUrlToUploadMovie(idMovie: number, option: string): Promise<{ key: string, value: string }[]>;
 	
-	// addActorForMovie(req: Request): Promise<MovieActor[]>;
-	// deleteActorOfMovie(req: Request): Promise<number>;
+	addActorForMovie(req: Request): Promise<MovieActor[]>;
+	deleteActorOfMovie(req: Request): Promise<number>;
 
 	addDirectorsForMovie(req: Request): Promise<MovieDirector[]>;
 	deleteDirectorsOfMovie(req: Request): Promise<number>;
