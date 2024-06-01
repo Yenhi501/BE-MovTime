@@ -1,5 +1,6 @@
 import { Movie } from '../../models/Movie';
 import express, { Request, Response, Router } from 'express';
+import { MovieDirector } from '../../models/MovieDirector';
 import { MovieGenre } from '../../models/MovieGenre';
 
 export interface IMovieService {
@@ -27,8 +28,8 @@ export interface IMovieService {
 	// addActorForMovie(req: Request): Promise<MovieActor[]>;
 	// deleteActorOfMovie(req: Request): Promise<number>;
 
-	// addDirectorsForMovie(req: Request): Promise<MovieDirector[]>;
-	// deleteDirectorsOfMovie(req: Request): Promise<number>;
+	addDirectorsForMovie(req: Request): Promise<MovieDirector[]>;
+	deleteDirectorsOfMovie(req: Request): Promise<number>;
 
 	addGenresForMovie(req: Request): Promise<MovieGenre[]>;
 	deleteGenresOfMovie(req: Request): Promise<number>;

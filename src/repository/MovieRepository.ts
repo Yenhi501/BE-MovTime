@@ -1,9 +1,14 @@
-import Database from '../config/database';
 import { Movie } from '../models/Movie';
-import { IMovieRepository } from './Interfaces/IMovieRepository';
-
-import { Service } from 'typedi';
 import { Genre } from '../models/Genre';
+import { MovieGenre } from '../models/MovieGenre';
+import { IMovieRepository } from './Interfaces/IMovieRepository';
+import Database from '../config/database';
+import { Op, QueryTypes, literal, OrderItem, Sequelize } from 'sequelize';
+import { Actor } from '../models/Actor';
+import { Director } from '../models/Director';
+import { Episode } from '../models/Episode';
+import Container, { Service } from 'typedi';
+// import { ISearchMovieOption } from './Interfaces/ISearchMovieOption';
 import { BaseRepository } from './BaseRepository';
 
 const db = Database.getInstance();
@@ -60,11 +65,11 @@ export class MovieRepository extends BaseRepository<Movie> implements IMovieRepo
 			// 	through: { attributes: [] },
 			// 	// where: { name: { [Op.iLike]: search } },
 			// },
-			// {
-			// 	model: Director,
-			// 	attributes: ['director_id', 'name'],
-			// 	through: { attributes: [] },
-			// },
+			{
+				model: Director,
+				attributes: ['director_id', 'name'],
+				through: { attributes: [] },
+			},
 
 		  ],
 		  order:[
@@ -115,11 +120,11 @@ export class MovieRepository extends BaseRepository<Movie> implements IMovieRepo
 					// 	attributes: ['actor_id', 'name', 'avatar'],
 					// 	through: { attributes: [] },
 					// },
-					// {
-					// 	model: Director,
-					// 	attributes: ['director_id', 'name', 'avatar'],
-					// 	through: { attributes: [] },
-					// },
+					{
+						model: Director,
+						attributes: ['director_id', 'name', 'avatar'],
+						through: { attributes: [] },
+					},
 					// {
 					// 	model: Episode,
 					// 	attributes: ['episode_id', 'movie_id', 'poster_url', 'title', 'release_date', 'num_view', 'duration', 'episode_no'],
@@ -159,13 +164,13 @@ export class MovieRepository extends BaseRepository<Movie> implements IMovieRepo
 					// 	},
 					// 	through: { attributes: [] },
 					// },
-					// {
-					// 	model: Director,
-					// 	attributes: {
-					// 		exclude: ['deletedAt', 'updatedAt', 'createdAt'],
-					// 	},
-					// 	through: { attributes: [] },
-					// },
+					{
+						model: Director,
+						attributes: {
+							exclude: ['deletedAt', 'updatedAt', 'createdAt'],
+						},
+						through: { attributes: [] },
+					},
 				],
 				order: [['movie_id', 'ASC']],
 			});
