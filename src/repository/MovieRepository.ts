@@ -115,11 +115,11 @@ export class MovieRepository extends BaseRepository<Movie> implements IMovieRepo
 						as: 'genres',
 						through: { attributes: [] },
 					},
-					// {
-					// 	model: Actor,
-					// 	attributes: ['actor_id', 'name', 'avatar'],
-					// 	through: { attributes: [] },
-					// },
+					{
+						model: Actor,
+						attributes: ['actor_id', 'name', 'avatar'],
+						through: { attributes: [] },
+					},
 					{
 						model: Director,
 						attributes: ['director_id', 'name', 'avatar'],
@@ -157,13 +157,13 @@ export class MovieRepository extends BaseRepository<Movie> implements IMovieRepo
 						},
 						through: { attributes: [] },
 					},
-					// {
-					// 	model: Actor,
-					// 	attributes: {
-					// 		exclude: ['deletedAt', 'updatedAt', 'createdAt'],
-					// 	},
-					// 	through: { attributes: [] },
-					// },
+					{
+						model: Actor,
+						attributes: {
+							exclude: ['deletedAt', 'updatedAt', 'createdAt'],
+						},
+						through: { attributes: [] },
+					},
 					{
 						model: Director,
 						attributes: {
