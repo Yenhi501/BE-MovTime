@@ -1,11 +1,15 @@
 import {
+	Model,
+	Table,
 	Column,
 	DataType,
+	BelongsToMany,
+	BelongsTo,
+	ForeignKey,
 	DeletedAt,
-	Model,
-	Table
+	HasOne,
 } from 'sequelize-typescript';
-
+import { User } from './User';
 
 @Table({
 	tableName: Account.ACCOUNT_TABLE_NAME,

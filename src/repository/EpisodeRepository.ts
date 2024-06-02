@@ -1,8 +1,11 @@
 import { Service } from 'typedi';
-import { BaseRepository } from '../BaseRepository';
-import { IEpisodeRepository } from './IEpisodeRepository';
-import { Episode } from '../../models/Episode';
-import { Movie } from '../../models/Movie';
+import { Episode } from '../models/Episode';
+import { BaseRepository } from './BaseRepository';
+import { IEpisodeRepository } from './Interfaces/IEpisodeRepository';
+import { Comment } from '../models/Comment';
+import { SubComment } from '../models/SubComment';
+import { User } from '../models/User';
+import { Movie } from '../models/Movie';
 
 @Service()
 export class EpisodeRepository extends BaseRepository<Episode> implements IEpisodeRepository{

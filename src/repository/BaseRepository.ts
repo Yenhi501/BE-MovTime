@@ -3,6 +3,7 @@ import { BaseInterface } from './Interfaces/BaseInterface';
 import sequelize from 'sequelize/types/sequelize';
 import { Op, WhereOptions } from 'sequelize';
 import Database from '../config/database';
+import { User } from '../models/User';
 
 export abstract class BaseRepository<T extends Model<T>>
 	implements BaseInterface

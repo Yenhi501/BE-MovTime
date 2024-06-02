@@ -8,9 +8,9 @@ import {
 	BelongsTo,
 	ForeignKey,
 } from 'sequelize-typescript';
+import { SubComment } from './SubComment';
 import { User } from './User';
 import { Episode } from './Episode';
-import { SubComment } from './SubComment';
 
 @Table({
 	tableName: Comment.TABLE_NAME,

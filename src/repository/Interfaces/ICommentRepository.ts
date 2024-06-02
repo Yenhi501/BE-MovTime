@@ -1,4 +1,3 @@
-
 import { Comment } from "../../models/Comment";
 import { BaseInterface } from "./BaseInterface"
 

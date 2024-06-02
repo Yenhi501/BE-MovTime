@@ -8,6 +8,7 @@ import yaml from 'yaml';
 import Database from './config/database';
 import './middleware/Passport';
 import AuthenticationRouter from './route/AuthenticationRoutes';
+import ChatRoutes from './route/ChatRoutes';
 import CommentRouter from './route/CommentRoutes';
 import EpisodeRouter from './route/EpisodeRoutes';
 import GenreRouter from './route/GenreRoutes';
@@ -60,6 +61,7 @@ class App {
 		this.app.use('/api/comments', CommentRouter);
 		this.app.use('/api/ratings', RatingRouter);
 		this.app.use('/api/statisticals', StatisticalRouter);
+		this.app.use('/api/chat', ChatRoutes);
 
 		const yamlFile = fs.readFileSync('swagger-api.yaml', 'utf8');
 		const options = yaml.parse(yamlFile);

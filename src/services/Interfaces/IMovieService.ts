@@ -1,5 +1,6 @@
 import { Movie } from '../../models/Movie';
 import express, { Request, Response, Router } from 'express';
+import { MovieActor } from '../../models/MovieActor';
 import { MovieDirector } from '../../models/MovieDirector';
 import { MovieGenre } from '../../models/MovieGenre';
 

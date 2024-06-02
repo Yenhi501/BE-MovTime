@@ -1,11 +1,12 @@
 import { Inject, Service } from "typedi";
 import { ICommentService } from "./Interfaces/ICommentsService";
+import { CommentRepository } from "../repository/CommentRepository";
+import { ICommentRepository } from "../repository/Interfaces/ICommentRepository";
 import { Request } from "express";
 import { ParsedQs } from "qs";
-import { ParamsDictionary } from "express-serve-static-core";
 import { Comment } from "../models/Comment";
-import { ICommentRepository } from "../repository/Interfaces/ICommentRepository";
-import { CommentRepository } from "../repository/CommentRepository";
+import { ParamsDictionary } from "express-serve-static-core";
+import { SubComment } from "../models/SubComment";
 import { SubCommentRepository } from "../repository/SubCommentRepository";
 import { ISubCommentRepository } from "../repository/Interfaces/ISubCommentRepository";
 

@@ -1,17 +1,17 @@
 import BaseRoutes from './Base/BaseRouter';
 import { MovieController } from '../controller/MovieController';
-// import { 
-// 	validateSearchMovies,
-// 	validateGetMovieById,
-// 	validateDeleteMovieById,
-// 	validateCreateMovie,
-// 	validateUpdateMovie,
-// 	validategetPresignUrlToUpload,
-// 	validateClearCacheCloudFront,
-// 	validateGetRelatedMovies
-// } from '../validators/MovieValidator';
+import { 
+	validateSearchMovies,
+	validateGetMovieById,
+	validateDeleteMovieById,
+	validateCreateMovie,
+	validateUpdateMovie,
+	validategetPresignUrlToUpload,
+	validateClearCacheCloudFront,
+	validateGetRelatedMovies
+} from '../validators/MovieValidator';
 import { validate } from '../validators/Validator';
-// import { auth, authAdmin, authUser } from '../middleware/AuthMiddleware';
+import { auth, authAdmin, authUser } from '../middleware/AuthMiddleware';
 class MovieRoutes extends BaseRoutes {
 	constructor() {
 		super(new MovieController());

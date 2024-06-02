@@ -1,7 +1,5 @@
+import { Service } from 'typedi';
 import { Genre } from '../models/Genre';
-import Database from '../config/database';
-import { Op, QueryTypes, literal, OrderItem, Sequelize } from 'sequelize';
-import Container, { Service } from 'typedi';
 import { BaseRepository } from './BaseRepository';
 import { IGenreRepository } from './Interfaces/IGenreRepository';
 

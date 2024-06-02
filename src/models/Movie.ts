@@ -1,15 +1,29 @@
-
+import { Episode } from './Episode';
 import {
-	BelongsToMany,
+	Model,
+	Table,
 	Column,
 	DataType,
+	BelongsToMany,
+	HasMany,
+	NotEmpty,
 	DeletedAt,
-	Model,
-	Table
+	BelongsTo,
+	ForeignKey,
 } from 'sequelize-typescript';
 import { Genre } from './Genre';
 import { MovieGenre } from './MovieGenre';
-
+import { Actor } from './Actor';
+import { MovieActor } from './MovieActor';
+import { Director } from './Director';
+import { MovieDirector } from './MovieDirector';
+import { User } from './User';
+import { MovieFavorite } from './MovieFavorite';
+import { WatchHistory } from './WatchHistory';
+import { WatchLater } from './WatchLater';
+import { Home } from './Home';
+import { Rating } from './Rating';
+import { Reserve } from './Reserve';
 // import {ListTrend} from "./ListTrend";
 
 @Table({
@@ -118,24 +132,24 @@ export class Movie extends Model {
 	@BelongsToMany(() => Genre, () => MovieGenre)
 	genres!: Genre[];
 
-	// @BelongsToMany(() => Actor, () => MovieActor)
-	// actors!: Actor[];
+	@BelongsToMany(() => Actor, () => MovieActor)
+	actors!: Actor[];
 
-	// @BelongsToMany(() => Director, () => MovieDirector)
-	// directors!: Director[];
+	@BelongsToMany(() => Director, () => MovieDirector)
+	directors!: Director[];
 
-	// @HasMany(() => Episode)
-	// episodes!: Episode[];
+	@HasMany(() => Episode)
+	episodes!: Episode[];
 
-	// @BelongsToMany(() => User, () => MovieFavorite)
-	// movieFavorites!: User[];
+	@BelongsToMany(() => User, () => MovieFavorite)
+	movieFavorites!: User[];
 
-	// @BelongsToMany(() => User, () => WatchLater)
-	// watchLater!: User[];
+	@BelongsToMany(() => User, () => WatchLater)
+	watchLater!: User[];
 
-	// @BelongsToMany(() => User, () => Rating)
-	// ratings!: User[];
+	@BelongsToMany(() => User, () => Rating)
+	ratings!: User[];
 
-	// @BelongsToMany(() => User, () => Reserve)
-	// reserves!: User[];
+	@BelongsToMany(() => User, () => Reserve)
+	reserves!: User[];
 }
