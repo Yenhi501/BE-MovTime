@@ -1,18 +1,16 @@
-import express, { Request, Response, Router } from 'express';
+import { Request, Response } from 'express';
+import Container from 'typedi';
 import { EpisodeService } from '../services/EpisodeService';
 import { IEpisodeService } from '../services/Interfaces/IEpisodeService';
-import Container from 'typedi';
 import { IMovieService } from '../services/Interfaces/IMovieService';
-import { MovieService } from '../services/MovieService';
 import { IUserService } from '../services/Interfaces/IUserService';
+import { MovieService } from '../services/MovieService';
 import { UserService } from '../services/UserService';
 
 export class EpisodeController{
 	private episodeService: IEpisodeService;
 	private movieService: IMovieService;
 	private userService: IUserService;
-
-
 
 	constructor() {
 		this.episodeService = Container.get(EpisodeService);

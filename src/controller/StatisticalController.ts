@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import Container from 'typedi';
-import { RatingService } from '../services/RatingService';
 import { IStatisticalService } from '../services/Interfaces/IStatisticalService';
 import { StatisticalService } from '../services/StatisticalService';
 

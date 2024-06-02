@@ -1,12 +1,10 @@
-import { DirectorService } from './../services/DirectorSevice';
-import Container, { Inject, Service } from 'typedi';
-import { ActorService } from '../services/ActorService';
 import { Request, Response } from 'express';
-import { Actor } from '../models/Actor';
-import { Director } from '../models/Director';
+import Container from 'typedi';
+import { ActorService } from '../services/ActorService';
 import { IActorService } from '../services/Interfaces/IActorService';
 import IDirectorService from '../services/Interfaces/IDirectorService';
 import { S3Service } from '../services/S3Service';
+import { DirectorService } from './../services/DirectorSevice';
 
 export class IndividualController {
 	private actorService: IActorService;
