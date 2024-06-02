@@ -48,6 +48,7 @@
 		"sequelize": "^6.35.0",
 		"sequelize-typescript": "^2.1.5",
 		"sort-object": "^3.0.3",
+		"swagger-ui-express": "^5.0.1",
 		"ts-node": "^10.9.1",
 		"typedi": "^0.10.0"
 	},
@@ -65,6 +66,7 @@
 		"@types/passport-google-oauth20": "^2.0.14",
 		"@types/pdf-parse": "^1.1.4",
 		"@types/qrcode": "^1.5.5",
+		"@types/swagger-ui-express": "^4.1.6",
 		"@types/xml2js": "^0.4.14",
 		"rimraf": "^5.0.1",
 		"ts-node": "^10.9.1",
