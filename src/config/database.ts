@@ -1,6 +1,29 @@
 import { Sequelize } from 'sequelize-typescript';
 import dotenv from 'dotenv';
+import { Movie } from '../models/Movie';
+import { Genre } from '../models/Genre';
+import { MovieGenre } from '../models/MovieGenre';
+import { Actor } from '../models/Actor';
+import { MovieActor } from '../models/MovieActor';
+import { MovieDirector } from '../models/MovieDirector';
+import { Director } from '../models/Director';
+import { Episode } from '../models/Episode';
+import { User } from '../models/User';
 import { Account } from '../models/Account';
+import { MovieFavorite } from '../models/MovieFavorite';
+import { WatchHistory } from '../models/WatchHistory';
+import { WatchLater } from '../models/WatchLater';
+import { SubscriptionType } from '../models/SubscriptionType';
+import { Subscription } from '../models/Subscription';
+import { Home } from '../models/Home';
+import { Payment } from '../models/Payment';
+import { Comment } from '../models/Comment';
+import { SubComment } from '../models/SubComment';
+import { Rating } from '../models/Rating';
+import { Duration } from '../models/Duration';
+import { SubscriptionInfo } from '../models/SubscriptionInfo';
+import { Quality } from '../models/Quality';
+import { Reserve } from '../models/Reserve';
 
 dotenv.config();
 
@@ -47,9 +70,30 @@ class Database {
 			},
 		});
 		this.sequelize.addModels([
-			
+			Movie,
+			Genre,
+			MovieGenre,
+			Episode,
+			Director,
+			MovieDirector,
+			Actor,
+			MovieActor,
+			User,
 			Account,
-			
+			MovieFavorite,
+			WatchHistory,
+			WatchLater,
+			Subscription,
+			SubscriptionType,
+			Home,
+			Payment,
+			Comment,
+			SubComment,
+			Rating,
+			Duration,
+			SubscriptionInfo,
+			Quality,
+			Reserve,
 		]);
 
 		await this.sequelize
